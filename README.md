@@ -1,4 +1,3 @@
-# Summer2022Projects
 # Summer2022_FermilabProjects
 Summer2022 Fermilab Projects Resources and LogBook 
 
