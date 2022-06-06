@@ -49,3 +49,13 @@ To run this we do the following:
 
 This will then loop through the output file we created and make a very condensed file that we can use to make plots! 
 
+* MakingPlotsFromAnalysisFile * 
+
+At this point we should be ready to make plots! 
+
+In this directory there is a fairly simple file `plot.C` inside there is documentation. 
+
+to run you just need to do the following:
+>root plot.C
+
+and you'll have a plot! 
