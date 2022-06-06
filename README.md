@@ -59,13 +59,13 @@ started with your own directories.
 #### Logging On
 Follow these commands on your terminal to access the computers: 
 - kinit -f <your_principle>@FNAL.GOV
-- ssh -Y -X <your_principle>@dunegpvm01.fnal.gov 
-- Now you should be on dunegpvm01 (the number indicates which computer node you are on)
+- ssh -Y -X <your_principle>@sbndgpvm01.fnal.gov 
+- Now you should be on sbndgpvm01 (the number indicates which computer node you are on)
 
 #### Your Workspace
 Run the following commands to get to the right place and organize your workspace. I 
 recommend running these all at least once, and then having them run on startup.
-- cd /dune/app/users/<your_principle>/
+- cd /sbnd/app/users/<your_principle>/
 - mkdir FirstTests
 - Use one of the following to copy the GitHub repository, the first didn't work for me but has worked for others:
   git clone git@github.com:FernandaPsihas/Summer2022_FermilabProjects.git
@@ -83,7 +83,7 @@ recommend running these all at least once, and then having them run on startup.
 #### Aliasing and Start on Log-in
 Here is some guidance on how to have commands run on log-in and how to alias. An alias is just a command nickname.
 - pico ~/.profile
-- Start adding commands such as cd /dune/app/users/<your_principal>
+- Start adding commands such as cd /sbnd/app/users/<your_principal>
 - Add an alias if you like: alias root='root -l' 
 
 #### Commiting Your Changes
