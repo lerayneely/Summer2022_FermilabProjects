@@ -52,6 +52,25 @@ Feel free to contact the [Fermilab service desk](https://fermi.servicenowservice
 - Access to gpvms (for the corresponding experiment for your project)
 
 
+#### Getting Your Computer ssh ready (For Windows)
+
+To connect to the LPC cluster for the first time with PuTTY:
+Double click on the PuTTY icon in the directory where you unzipped the zip file.
+In the PuTTY configuration window:
+- select Session and enter <hostname>.fnal.gov in the HostName field
+- select Connection -> Data and enter your username in the Auto-login username field
+- select Connection -> SSH and select "2 only" for "Preferred SSH protocol version"
+- select Connection -> SSH -> X11 and check "Enable X11 forwarding"
+- select Connection -> SSH -> Auth -> GSSAPI and check both boxes: "Attempt GSSAPI authentication" and "Allow GSSAPI credential delegation" settings
+- select Session and enter LPC in the Saved Sessions field and click Save
+- double click on LPC in the Saved Sessions list
+
+Daily use: to connect to the LPC cluster with PuTTY (after you have obtained your Kerberos ticket):
+- Double click the PuTTY icon.
+In the PuTTY configuration window:
+- select Session and double click on LPC in the Saved Sessions list
+
+
 ## Getting Started
 Here is a description on how to log in to the Fermilab computers and how to get 
 started with your own directories.
