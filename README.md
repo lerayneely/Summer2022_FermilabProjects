@@ -15,7 +15,6 @@ Make sure you have the software/basic knowledge of the following items:
 *You can read some tips on how to make good poster [here](http://fernandapsihas.com/pdfs/201806PosterTutorial.pdf)*
 
 - Make sure you have access to our [google drive](https://drive.google.com/drive/folders/1BupXqZLntiGN9Y2N8VzvRJw5IiBG0abo?usp=sharing) 
-- 
 - Upload your slides to the meeting folder (or create one first if it doesn't exist)
 
 #### Github 
