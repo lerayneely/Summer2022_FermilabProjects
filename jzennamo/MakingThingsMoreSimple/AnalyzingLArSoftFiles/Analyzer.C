@@ -39,7 +39,7 @@
 #include "canvas/Persistency/Common/Ptr.h"
 #include "canvas/Persistency/Provenance/Timestamp.h"
 
-//I'll need, calo, tracks, hits, anab::T0
+//
 
 #include "lardataobj/RecoBase/Hit.h"
 #include "canvas/Persistency/Provenance/EventAuxiliary.h"
@@ -54,7 +54,7 @@
 using namespace art;
 using namespace std;
 
-void Analyzer(){
+void Analyzer(string input){
   
   // create a vector of files we want to process
   std::vector<string> filenames;
@@ -63,13 +63,14 @@ void Analyzer(){
   // is very long so if we want to run over it all it'll take a while
   // and we'll probably want to break it up on the grid
 
-  ifstream myfile("../../FileLists/list_of_monoenergetic_2.5MeV_electrons_doped.list");
+  //  ifstream myfile("../../FileLists/list_of_monoenergetic_2.5MeV_electrons_undoped.list");
+  ifstream myfile(Form("../../FileLists/list_of_%s.list",input.c_str()));
   copy(istream_iterator<string>(myfile),
        istream_iterator<string>(),
        back_inserter(filenames));
  
   //We'll just check the first 25 files for now
-  filenames.erase(filenames.begin()+25,filenames.end());
+  //filenames.erase(filenames.begin()+250,filenames.end());
   
   std::cout << "File Count: " << filenames.size() << std::endl; 
     
@@ -77,7 +78,7 @@ void Analyzer(){
   // I did this crazy inefficiently but I don't really care
   // This is currently only set up for single dimensional 
   // projections but extenting it to 2D will be straight forward
-  TFile* out = new TFile("output.root","RECREATE");  
+  TFile* out = new TFile(Form("%s.root",input.c_str()),"RECREATE");  
   TTree* fTree = new TTree("EventTree","tree");
   int Run;
   fTree->Branch("Run",&Run);
@@ -103,11 +104,35 @@ void Analyzer(){
   double reco_tot_hit_Q;
   fTree->Branch("reco_tot_hit_Q",&reco_tot_hit_Q);
 
+  double reco_N_hit;
+  fTree->Branch("reco_N_hit",&reco_N_hit);
+  
+  double reco_mean_hit_Q;
+  fTree->Branch("reco_mean_hit_Q",&reco_mean_hit_Q);
+  
+  double reco_min_hit_Q;
+  fTree->Branch("reco_min_hit_Q",&reco_min_hit_Q);
+
+  double reco_max_hit_Q;
+  fTree->Branch("reco_max_hit_Q",&reco_max_hit_Q);
+
   double reco_tot_matched_E;
   fTree->Branch("reco_tot_matched_E",&reco_tot_matched_E);
   
   double reco_tot_wire_Q;
   fTree->Branch("reco_tot_wire_Q",&reco_tot_wire_Q);
+
+  double reco_mean_wire_Q;
+  fTree->Branch("reco_mean_wire_Q",&reco_mean_wire_Q);
+  
+  double reco_min_wire_Q;
+  fTree->Branch("reco_min_wire_Q",&reco_min_wire_Q);
+
+  double reco_max_wire_Q;
+  fTree->Branch("reco_max_wire_Q",&reco_max_wire_Q);
+
+  double reco_N_wire;
+  fTree->Branch("reco_N_wire",&reco_N_wire);
 
   // gallery makes it easy to just hand a vector of files
 
@@ -127,22 +152,28 @@ void Analyzer(){
     true_L = 0.0;
 
     reco_tot_hit_Q = 0.0;
+    reco_N_hit = 0.0;
+    reco_mean_hit_Q = 0.0;
+    reco_min_hit_Q = 0.0;
+    reco_max_hit_Q = 0.0;
     reco_tot_matched_E = 0.0;
     reco_tot_wire_Q = 0.0;
+    reco_mean_wire_Q = 0.0;
+    reco_min_wire_Q = 0.0;
+    reco_max_wire_Q = 0.0;
+    reco_N_wire = 0.0;
 
     Run = ev.eventAuxiliary().run();
     Subrun = ev.eventAuxiliary().subRun();
     Event = ev.eventAuxiliary().event();
     
-
-
     // This is the truth particles
     auto const &mctruth_handle =
       ev.getValidHandle< std::vector<simb::MCTruth> >("generator");
 
     auto const &simedep_handle = 
-      //ev.getValidHandle< std::vector<sim::SimEnergyDeposit> >("ionandscint:priorSCE");
-      ev.getValidHandle< std::vector<sim::SimEnergyDeposit> >("psdope:psdoped");
+      ev.getValidHandle< std::vector<sim::SimEnergyDeposit> >("ionandscint:priorSCE");
+      //ev.getValidHandle< std::vector<sim::SimEnergyDeposit> >("psdope:psdoped");
 
     // This is a reconstruction of charge on a single channel 
     auto const &hit_handle =
@@ -177,7 +208,12 @@ void Analyzer(){
       
     }
     
-       
+    reco_min_hit_Q = 100000000000.0;
+    reco_max_hit_Q = 0;
+
+    reco_min_wire_Q = 100000000000.0;
+    reco_max_wire_Q = 0;
+    
     for(int h = 0; h < gaus_hits.size(); h++){
       
       auto hit = gaus_hits.at(h);
@@ -191,28 +227,42 @@ void Analyzer(){
       for(int mcp = 0; mcp < parts_in_my_hit.size(); mcp++){
 
 	auto mcpart = parts_in_my_hit.at(mcp);
-	
-	reco_tot_hit_Q += hit.Integral();
+
+	reco_N_hit++;
+	reco_tot_hit_Q += hit.Integral();	
+	reco_mean_hit_Q += hit.Integral();
 	reco_tot_matched_E += partInfo_in_my_hit.at(mcp)->energy;
       	
+	if(hit.Integral() < reco_min_hit_Q) reco_min_hit_Q = hit.Integral(); 
+	if(hit.Integral() > reco_max_hit_Q) reco_max_hit_Q = hit.Integral(); 
+
 	auto wires = wires_per_hit.at(h);
 
+
+	reco_N_wire += wires.size();
+	int ticks = 0;
 	for(int wr = 0; wr < wires.size(); wr++){
-		 
+		 	  
 	  auto signals = wires[wr]->Signal();
 	
 	  int tick = 0;
 	  for(int s = hit.StartTick(); s <= hit.EndTick(); s++){
 	    if(s >= hit.StartTick() && s <= hit.EndTick()){
 	      reco_tot_wire_Q += signals[s];
+	      reco_mean_wire_Q += signals[s];
+	      ticks++;
+	      if(signals[s] < reco_min_wire_Q) reco_min_wire_Q = signals[s];
+	      if(signals[s] > reco_max_wire_Q) reco_max_wire_Q = signals[s];
 
 	    }//overlap with hit
 	  }//iterate over all matched ticks
 	  	  
 	}// Iterate over recob::Wires Matched to Hits
+	reco_mean_wire_Q /= ticks;
       }//Iterate over MCP matched to hits
     }//Iterate over hits
-     
+    reco_mean_hit_Q /= reco_N_hit; 
+
     fTree->Fill();
 
   }//Iterate over Events
